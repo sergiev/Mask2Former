@@ -71,6 +71,10 @@ def get_parser():
         help="Minimum score for instance predictions to be shown",
     )
     parser.add_argument(
+        "--mask",
+        help="Save predictions as binary mask."
+    )
+    parser.add_argument(
         "--opts",
         help="Modify config options using the command-line 'KEY VALUE' pairs",
         default=[],
@@ -116,6 +120,15 @@ if __name__ == "__main__":
             img = read_image(path, format="BGR")
             start_time = time.time()
             predictions, visualized_output = demo.run_on_image(img)
+            masks=predictions['instances'].get_fields()['pred_masks'].cpu().detach().numpy()
+            if args.mask:
+                semantic = np.zeros_like(masks[0])
+                for mask in masks:
+                    semantic += mask
+                semantic = np.clip(semantic, 0, 1)
+                semantic *= 255
+                out_filename = args.mask + '.png' * int(1 - args.mask.endswith('.png')) 
+                cv2.imwrite(args.mask, semantic)
             logger.info(
                 "{}: {} in {:.2f}s".format(
                     path,
