@@ -160,6 +160,12 @@ class MaskFormerSemanticDatasetMapper:
         # Prepare per-category binary masks
         if sem_seg_gt is not None:
             sem_seg_gt = sem_seg_gt.numpy()
+            if sem_seg_gt.ndim == 3:
+                equal_channels = all([np.all(sem_seg_gt[:,:,i-1]==sem_seg_gt[:,:,i]) for i in range(1, sem_seg_gt.ndim)])
+                assert equal_channels, equal_channels
+                sem_seg_gt = sem_seg_gt[:,:,0]
+            if sem_seg_gt.ndim > 2:
+                raise ValueError(f"Cannot handle sem_seg_gt with {sem_seg_gt.shape} shape")
             instances = Instances(image_shape)
             classes = np.unique(sem_seg_gt)
             # remove ignored region

@@ -19,9 +19,9 @@ INSTANCE_SUBSETS = [
 ]
 
 SEMANTIC_SUBSETS = [
-        ("uchastok_semantic_train", "train/uchastok_2021", "train/annotations"),
-        ("uchastok_semantic_test","test/uchastok_2021", "test/annotations"),
-        ("uchastok_semantic_eval", "eval/uchastok_2021", "eval/annotations")
+        ("uchastok_semantic_train", "train/uchastok_2021", "train/anno/semantic"),
+        ("uchastok_semantic_test","test/uchastok_2021", "test/anno/semantic"),
+        ("uchastok_semantic_eval", "eval/uchastok_2021", "eval/anno/semantic")
 ]
 
 PANOPTIC_SUBSETS = [
@@ -33,8 +33,6 @@ PANOPTIC_SUBSETS = [
 ROOT = '/mnt/localssd/MaskToFormer/data/dataset'
 
 def _get_coco_stuff_meta():
-    # Id 0 is reserved for ignore_label, we change ignore_label for 0
-    # to 255 in our pre-processing.
     stuff_ids = [k["id"] for k in COCO_CATEGORIES]
 
     # For semantic segmentation, this mapping maps from contiguous stuff id
@@ -59,7 +57,7 @@ def register_semantic_segmentation(root=ROOT):
             image_root=full_image_root,
             sem_seg_root=full_sem_seg_root,
             evaluator_type="sem_seg",
-            ignore_label=255,
+            ignore_label=0,
             **meta,
         )
 
